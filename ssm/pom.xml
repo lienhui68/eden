@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>eden</artifactId>
+        <groupId>com.eh</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ssm</artifactId>
+    <packaging>war</packaging>
+
+    <name>ssm Maven Webapp</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <springframework.version>5.2.8.RELEASE</springframework.version>
+        <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
+        <jsp-api.version>2.2</jsp-api.version>
+        <jstl.version>1.2</jstl.version>
+        <mysql-connector-java.version>6.0.6</mysql-connector-java.version>
+    </properties>
+
+    <dependencies>
+        <!--mybatis核心包-->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.6</version>
+        </dependency>
+
+        <!-- mysql驱动包 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql-connector-java.version}</version>
+        </dependency>
+
+        <!--mybatis整合spring包-->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>2.0.5</version>
+        </dependency>
+
+        <!-- 整合Spring -->
+        <!--
+        从Spring 3.2开始不需要定义CGLIB依赖（目前的版本是CGLIB 3.0）。现在使用内嵌在spring-core JAR
+        commons-logging日志jar包也无需单独引入，spring已引入
+        -->
+        <!--BEGIN IOC-->
+        <!--Context，提供上下文、全局配置，实现了Spring注入容器并且依赖-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <!--核心组件-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <!--管理beans，JavaBean机制-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <!--Spring EL表达式 (SpEL)-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-expression</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <!--END IOC-->
+
+        <!--BEGIN JDBC-->
+        <!--增加了Hibernate和JPA功能支持，比如HibernateTemplate和JpaTemplate以及一些额外的持久化相关的依赖-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <!--在JDBC数据访问库定义Spring JDBC支持以及JdbcTemplate-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <!--Spring-tx提供了非常灵活的事务管理抽象-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+
+        <!--END JDBC-->
+
+
+        <!--BEGIN WEB-->
+        <!--
+        在Maven配置Spring MVC要增加Spring Web和Servlet支持，需要在上面已配置的pom文件中额外增加两个依赖
+        spring-webmvc spring-webmvc则在Servlet环境中启用MVC支持
+        spring-web  spring-web包包含Servlet和Portlet所需要通用组件
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        由于spring-webmvc依赖于spring-web，所以定义了spring-webmvc依赖后，可以不用显示的在pom定义spring-web
+        -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <!--END WEB-->
+
+        <!--BEGIN AOP-->
+        <!--提供aop框架，将日志输出、权限验证等分离-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <!--END AOP-->
+
+        <!-- BEGIN Servlet相关依赖包 -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>${jsp-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>${jstl.version}</version>
+        </dependency>
+        <!-- END Servlet相关依赖包 -->
+        <!--TEST-->
+        <!--
+        从Spring 3.2开始，Spring MVC Test项目已经被包含到核心的Spring Test框架中（原来是一个独立项目，项目托管在GitHub）。
+        所以，从Spring 3.2开始，仅需要在依赖配置中配置spring-test依赖即可。
+        注意：对于使用Spring 3.1及以下版本的应用来说，独立的spring-mvc-test依赖还是可以使用的，可以参考这里进行配置。
+        但是，这个依赖已经不再Maven的中央库中，所以如果需要增加依赖需要配置自定义Maven容器。
+        -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${springframework.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- DB连接池 -->
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--
+        mybatis-generator是一款在使用mybatis框架时，自动生成model，dao和mapper的工具，
+        很大程度上减少了业务开发人员的手动编码时间
+        -->
+        <dependency>
+            <groupId>org.mybatis.generator</groupId>
+            <artifactId>mybatis-generator-core</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+
+        <!-- 引入日志包 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.12</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.1.7</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.7</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.mybatis.generator</groupId>
+                <artifactId>mybatis-generator-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <!-- mybatis用于生成代码的配置文件 -->
+                    <configurationFile>src/main/resources/generatorConfig.xml</configurationFile>
+                    <verbose>true</verbose>
+                    <!--是否覆盖，单表初创的时候可以覆盖，之后要注意生成器配置里要生成哪些表，切勿覆盖稳定版的表映射-->
+                    <overwrite>true</overwrite>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>Generate MyBatis Artifacts</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>${mysql-connector-java.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
