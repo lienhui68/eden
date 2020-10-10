@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eh.eden.mybatis.orm.dao.EmployeeMapper">
+
+    <!-- ehcache配置项 -->
+    <cache type="org.mybatis.caches.ehcache.LoggingEhcache" >
+        <property name="timeToIdleSeconds" value="3600"/><!--1 hour-->
+        <property name="timeToLiveSeconds" value="3600"/><!--1 hour-->
+        <property name="maxEntriesLocalHeap" value="1000"/>
+        <property name="maxEntriesLocalDisk" value="10000000"/>
+        <property name="memoryStoreEvictionPolicy" value="LRU"/>
+    </cache>
+
+
+    <!--
+	获取自增主键的值：
+		mysql支持自增主键，自增主键值的获取，mybatis也是利用statement.getGeneratedKeys()；
+		useGeneratedKeys="true"；使用自增主键获取主键值策略
+		keyProperty；指定对应的主键属性，也就是mybatis获取到主键值以后，将这个值封装给javaBean的哪个属性
+	-->
+    <insert id="insertEmployee" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_employee(last_name, gender, email) values(#{lastName}, #{gender}, #{email});
+    </insert>
+
+    <!--parameterType可省略-->
+    <!--    <insert id="insertEmployee" parameterType="com.eh.eden.mybatis.orm.bean.Employee">-->
+    <!--        insert into tbl_employee(last_name, gender, email) values(#{lastName}, #{gender}, #{email});-->
+    <!--    </insert>-->
+
+
+    <delete id="deleteEmployee">
+        delete from tbl_employee where id = #{id}
+    </delete>
+
+    <update id="updateEmployeeById">
+        update tbl_employee
+            set last_name = #{lastName},
+                gender = #{gender},
+                email = #{email}
+            where id = #{id}
+    </update>
+
+    <select id="getEmployeeById" resultType="com.eh.eden.mybatis.orm.bean.Employee">
+        select id, last_name, gender, email from tbl_employee where id = #{idabc}
+    </select>
+
+
+    <!--
+    Employee getEmployeeByIdAndName(Integer id, String name);
+    -->
+    <select id="getEmployeeByIdAndName" resultType="com.eh.eden.mybatis.orm.bean.Employee">
+        select id, last_name, gender, email from tbl_employee where id = ${id} and last_name = #{lastName}
+    </select>
+
+    <select id="getEmployeeByMap" resultType="com.eh.eden.mybatis.orm.bean.Employee">
+        select id, last_name, gender, email from tbl_employee where id = #{id} and last_name = #{lastName}
+    </select>
+
+    <select id="getEmployeeByDynamicTable" resultType="com.eh.eden.mybatis.orm.bean.Employee">
+        select id, last_name, gender, email from ${tableName} where id = #{id} and last_name = #{lastName}
+    </select>
+
+    <!--List<Employee> getEmployeeByLastNameLike(String lastNameLike);-->
+    <select id="getEmployeeByLastNameLike" resultType="com.eh.eden.mybatis.orm.bean.Employee">
+        select id, last_name, gender, email from tbl_employee where last_name like #{lastName}
+    </select>
+
+    <select id="getSingleMapById" resultType="map">
+        select * from tbl_employee where id = #{id}
+    </select>
+
+    <select id="getMultiMapByLastNameLike" resultType="map">
+        <bind name="_last_Name" value="'%'+lastName+'%'"></bind>
+        select * from tbl_employee where last_name like #{lastName}
+    </select>
+
+</mapper>

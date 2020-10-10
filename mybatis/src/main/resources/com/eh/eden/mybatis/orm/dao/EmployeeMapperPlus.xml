@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eh.eden.mybatis.orm.dao.EmployeeMapperPlus">
+
+    <!--自定义某个javaBean的封装规则
+	type：自定义规则的Java类型
+	id:唯一id方便引用
+	  -->
+    <resultMap id="employee" type="com.eh.eden.mybatis.orm.bean.Employee">
+        <!--指定主键列的封装规则
+		id定义主键会底层有优化；
+		column：指定哪一列
+		property：指定对应的javaBean属性
+		  -->
+        <id column="id" property="id"/>
+        <!-- 定义普通列封装规则 -->
+        <result column="last_name" property="lastName"/>
+        <!-- 其他不指定的列会自动封装：我们只要写resultMap就把全部的映射规则都写上。 -->
+        <result column="email" property="email"/>
+        <result column="gender" property="gender"/>
+    </resultMap>
+
+    <!-- resultMap:自定义结果集映射规则；  -->
+    <select id="getEmployeeById" resultMap="employee">
+        select * from tbl_employee where id = #{id}
+    </select>
+
+
+    <resultMap id="unionEmployee" type="com.eh.eden.mybatis.orm.bean.Employee">
+        <id column="id" property="id"/>
+        <result column="last_name" property="lastName"/>
+        <result column="gender" property="gender"/>
+        <result column="email" property="email"/>
+        <!--  association可以指定联合的javaBean对象
+        property="dept"：指定哪个属性是联合的对象
+        javaType:指定这个属性对象的类型[可以省略，省略之后id会报红字但不影响正常运行]
+        -->
+        <association property="dept" javaType="com.eh.eden.mybatis.orm.bean.Dept">
+            <id column="d_id" property="id"/>
+            <result column="d_name" property="deptName"/>
+        </association>
+    </resultMap>
+
+    <select id="getUnionEmployeeById" resultMap="unionEmployee">
+        select e.*, d.id d_id, d.dept_name d_name  from tbl_employee e, tbl_dept d
+        where e.dept_id = d.id
+        and e.id = #{id};
+    </select>
+
+
+    <resultMap id="stepEmployeeDis" type="com.eh.eden.mybatis.orm.bean.Employee">
+        <id column="id" property="id"/>
+        <result column="last_name" property="lastName"/>
+        <result column="email" property="email"/>
+        <result column="gender" property="gender"/>
+
+        <!--
+	 		column：指定判定的列名
+	 		javaType：列值对应的java类型  -->
+        <discriminator javaType="string" column="gender">
+            <!--女生  resultType:指定封装的结果类型；不能缺少。和resultMap二选一 -->
+            <case value="0" resultType="com.eh.eden.mybatis.orm.bean.Employee">
+                <association property="dept"
+                             javaType="com.eh.eden.mybatis.orm.bean.Dept"
+                             select="com.eh.eden.mybatis.orm.dao.DeptMapper.getDeptById"
+                             column="d_id"/>
+            </case>
+            <!--男生 把last_name这一列的值赋值给email; -->
+            <case value="1" resultType="com.eh.eden.mybatis.orm.bean.Employee">
+                <id column="id" property="id"/>
+                <result column="last_name" property="lastName"/>
+                <result column="last_name" property="email"/>
+                <result column="gender" property="gender"/>
+            </case>
+        </discriminator>
+    </resultMap>
+
+    <select id="getEmployeeByIdStepDis" resultMap="stepEmployeeDis">
+        select e.*, d.id d_id, d.dept_name d_name  from tbl_employee e, tbl_dept d
+        where e.dept_id = d.id
+        and e.id = #{id};
+    </select>
+
+    <select id="getEmployeesByDeptId" resultType="com.eh.eden.mybatis.orm.bean.Employee">
+        select * from tbl_employee where dept_id = #{deptId}
+    </select>
+</mapper>

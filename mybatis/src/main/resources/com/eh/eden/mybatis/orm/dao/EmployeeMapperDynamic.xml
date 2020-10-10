@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eh.eden.mybatis.orm.dao.EmployeeMapperDynamic">
+
+    <resultMap id="employee" type="com.eh.eden.mybatis.orm.bean.Employee">
+        <id column="id" property="id"/>
+        <result column="last_name" property="lastName"/>
+    </resultMap>
+
+
+    <!--Employee getEmployeeByConditionIf(Employee employee);-->
+    <select id="getEmployeeByConditionIf" resultMap="employee">
+        select * from tbl_employee
+        <!-- 后面多出的and或者or where标签不能解决
+	 	prefix="":前缀：trim标签体中是整个字符串拼串 后的结果。
+	 			prefix给拼串后的整个字符串加一个前缀
+	 	prefixOverrides="":
+	 			前缀覆盖： 去掉整个字符串前面多余的字符
+	 	suffix="":后缀
+	 			suffix给拼串后的整个字符串加一个后缀
+	 	suffixOverrides=""
+	 			后缀覆盖：去掉整个字符串后面多余的字符
+	 	-->
+        <!-- 自定义字符串的截取规则 -->
+        <trim prefix="where" suffixOverrides="and">
+            <if test="id != null">
+                id = #{id} and
+            </if>
+            <if test="lastName != null and lastName != ''">
+                last_name = #{lastName} and
+            </if>
+            <if test="email != null and email.trim() != ''">
+                email = #{email} and
+            </if>
+            <if test="gender == 0 or gender == 1">
+                gender = #{gender}
+            </if>
+        </trim>
+    </select>
+
+    <!--Employee getEmployeeByConditionChoose(Employee employee);-->
+    <select id="getEmployeeByConditionChoose" resultMap="employee">
+        select * from tbl_employee
+        <where>
+            <choose>
+                <when test="id !=null">
+                    id = #{id}
+                </when>
+                <when test="lastName !=null">
+                    last_name = #{lastName}
+                </when>
+                <otherwise>
+                    gender = 0
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+
+    <!--void updateEmployeeById(Employee employee);-->
+    <update id="updateEmployeeById">
+        update tbl_employee
+        <trim prefix="set" suffixOverrides=",">
+            <if test="lastName!=null">
+                last_name=#{lastName},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="gender!=null">
+                gender=#{gender}
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <!--List<Employee> getEmployeesByIds(List<Integer> ids);-->
+    <select id="getEmployeesByIds" resultMap="employee">
+        select * from tbl_employee where id in
+        <!--
+	 		collection：指定要遍历的集合：
+	 			list类型的参数会特殊处理封装在map中，map的key就叫list
+	 		item：将当前遍历出的元素赋值给指定的变量
+	 		separator:每个元素之间的分隔符
+	 		open：遍历出所有结果拼接一个开始的字符
+	 		close:遍历出所有结果拼接一个结束的字符
+	 		index:索引。遍历list的时候是index就是索引，item就是当前值
+	 				      遍历map的时候index表示的就是map的key，item就是map的值
+
+	 		#{变量名}就能取出变量的值也就是当前遍历出的元素
+	 	  -->
+        <foreach collection="list" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </select>
+
+    <sql id="insertColumnList">
+        last_name,email,gender,dept_id
+    </sql>
+    <!-- 这种方式需要数据库连接属性allowMultiQueries=true；
+		如：jdbc.url=jdbc:mysql://localhost:3306/mybatis?allowMultiQueries=true
+	 	这种分号分隔多个sql可以用于其他的批量操作（删除，修改） -->
+    <insert id="insertEmployees">
+        <foreach collection="list" item="emp" separator=";">
+            insert into tbl_employee(<include refid="insertColumnList"/>)
+            values
+            (#{emp.lastName}, #{emp.email},#{emp.gender},#{emp.dept.id})
+        </foreach>
+    </insert>
+
+</mapper>

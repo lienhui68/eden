@@ -1,0 +1,8 @@
+<!--定义根元素students，且有多个子元素student-->
+<!ELEMENT students (student*)>
+<!--定义子元素student，且有name和age两个子元素-->
+<!ELEMENT student (name, age)>
+<!--定义子元素name， 类型是一个字符串-->
+<!ELEMENT name (#PCDATA)>
+<!--定义子元素age， 类型是一个字符串，dtd不支持整型等数据类型-->
+<!ELEMENT age (#PCDATA)>
